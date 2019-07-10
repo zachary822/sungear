@@ -7,7 +7,12 @@ Sungear visulization.
 ## Install
 
 ```bash
+# if you want the standalone web app
+$ pip install sungear[web]
+
+# if you only want to use the python fuctions
 $ pip install sungear
+
 ```
 
 ## Example
