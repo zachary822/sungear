@@ -24,7 +24,8 @@ setup(
     ],
     packages=['sungear'],
     package_data={
-        'sungear': 'static/*'
+        'sungear': ['static/*'],
+        '': ['LICENSE']
     },
     python_requires='>=3.6',
     install_requires=[

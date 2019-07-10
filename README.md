@@ -1,10 +1,26 @@
-# SunGear
+# Sungear
 
 ## Introduction
 
+Sungear visulization.
+
+## Install
+
+```bash
+$ pip install sungear
+```
+
+## Example
+
+```bash
+$ python -m sungear
+```
+
+Then open browser to http://localhost:5000 to use.
+
 ## License
 
-MIT
+[MIT](./LICENSE)
 
 ## Reference
 
