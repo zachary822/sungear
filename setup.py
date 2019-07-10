@@ -9,7 +9,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='sungear',
-    version='1.0.1',
+    version='1.0.2',
     description='Web based Sungear visualization.',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -33,6 +33,9 @@ setup(
         'pandas',
         'scikit-learn'
     ],
+    extras_require={
+        'web': ['flask']
+    },
     project_urls={
         'Bug Reports': 'https://github.com/zachary822/sungear/issues'
     }
