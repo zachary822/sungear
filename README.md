@@ -40,6 +40,15 @@ result = sungear.sungear(item_lists)
 
 This contains coordinates of nodes and vertices.
 
+## Development Notes
+
+```bash
+# clone with submodules
+$ git clone --recurse-submodules https://github.com/zachary822/sungear.git
+# build web assets
+$ python setup.py webpack
+```
+
 ## License
 
 [MIT](./LICENSE)

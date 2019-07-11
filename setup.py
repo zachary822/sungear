@@ -1,8 +1,39 @@
+import glob
+import os
 import os.path as path
+import shutil
 
-from setuptools import setup
+from setuptools import Command, setup
 
 here = path.abspath(path.dirname(__file__))
+
+SUNGEAR_STATIC_PATH = path.join(here, 'sungear', 'static')
+
+
+class Webpack(Command):
+    description = "build web assets"
+    user_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import subprocess
+        subprocess.run(["npm", "run", "build"], cwd=path.join(here, 'sungear_react'))
+
+        os.makedirs(SUNGEAR_STATIC_PATH, exist_ok=True)
+
+        for p in glob.glob(os.path.join(SUNGEAR_STATIC_PATH, '*')):
+            os.remove(p)
+
+        for p in glob.glob(os.path.join(here, 'sungear_react', 'dist', '*')):
+            if p.endswith('report.html'):
+                continue
+            shutil.copy(p, SUNGEAR_STATIC_PATH)
+
 
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
@@ -38,5 +69,8 @@ setup(
     },
     project_urls={
         'Bug Reports': 'https://github.com/zachary822/sungear/issues'
+    },
+    cmdclass={
+        'webpack': Webpack
     }
 )
