@@ -17,11 +17,28 @@ $ pip install sungear
 
 ## Example
 
+### Standalone Web App
+
 ```bash
 $ python -m sungear
 ```
 
 Then open browser to http://localhost:5000 to use.
+
+### Python Functions
+
+```python
+import sungear
+
+item_lists = {
+    'name1': ['item1', 'item2', ...],
+    'name2': ['item1', 'item2', ...],
+}
+
+result = sungear.sungear(item_lists)
+```
+
+This contains coordinates of nodes and vertices.
 
 ## License
 
