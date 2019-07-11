@@ -1,0 +1,3 @@
+[submodule "sungear_react"]
+	path = sungear_react
+	url = ./sungear_react/
