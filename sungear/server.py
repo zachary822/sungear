@@ -1,4 +1,8 @@
+"""
+Simple Flask server that serves Sungear functionality as a web app
+"""
 from collections import OrderedDict
+from json import JSONDecodeError
 
 import numpy as np
 import pandas as pd
@@ -31,9 +35,12 @@ def sungear_query():
         if not body['value']:
             abort(400)
 
-        item_lists = get_lists(body['value'])
-        # filter here
+        try:
+            item_lists = json.loads(body['value'])
+        except JSONDecodeError:
+            item_lists = get_lists(body['value'])
 
+        # filter here
         try:
             if body['filter_list']:
                 item_lists = OrderedDict(filter_lists(item_lists, body['filter_list']))
@@ -44,7 +51,6 @@ def sungear_query():
 
         return jsonify(res)
     except (KeyError, ValueError, SungearException) as e:
-        print(e)
         abort(400)
 
 
