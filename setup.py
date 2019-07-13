@@ -22,7 +22,7 @@ class Webpack(Command):
 
     def run(self):
         import subprocess
-        subprocess.run(["npm", "run", "build"], cwd=path.join(here, 'sungear_react'))
+        subprocess.run(["npm", "run", "build"], cwd=path.join(here, 'sungear_react'), check=True)
 
         os.makedirs(SUNGEAR_STATIC_PATH, exist_ok=True)
 
@@ -40,7 +40,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='sungear',
-    version='1.0.10',
+    version='1.0.11',
     description='Web based Sungear visualization.',
     long_description=long_description,
     long_description_content_type='text/markdown',
