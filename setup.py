@@ -22,6 +22,7 @@ class Webpack(Command):
 
     def run(self):
         import subprocess
+        subprocess.run(["npm", "install"], cwd=path.join(here, 'sungear_react'), check=True)
         subprocess.run(["npm", "run", "build"], cwd=path.join(here, 'sungear_react'), check=True)
 
         os.makedirs(SUNGEAR_STATIC_PATH, exist_ok=True)
