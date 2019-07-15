@@ -17,6 +17,10 @@ $ pip install sungear
 
 ## Example
 
+### See It In Action
+
+https://sungear.herokuapp.com/
+
 ### Standalone Web App
 
 ```bash
