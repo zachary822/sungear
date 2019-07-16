@@ -1,1 +1,1 @@
-web: gunicorn -k eventlet sungear.server:app
+web: gunicorn -k gevent --preload sungear.server:app
