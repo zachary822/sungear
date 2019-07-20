@@ -41,7 +41,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='sungear',
-    version='1.0.15',
+    version='1.1.0',
     description='Web based Sungear visualization.',
     long_description=long_description,
     long_description_content_type='text/markdown',
@@ -63,7 +63,9 @@ setup(
     install_requires=[
         'numpy',
         'pandas',
-        'scikit-learn'
+        'scikit-learn',
+        'scipy',
+        'statsmodels'
     ],
     extras_require={
         'web': ['flask']
