@@ -1,9 +1,8 @@
 import logging
 import warnings
 from collections import OrderedDict, defaultdict
-from functools import reduce
-from itertools import groupby
-from operator import itemgetter, or_
+from itertools import chain, groupby
+from operator import itemgetter
 from typing import DefaultDict, Dict, List, Tuple
 
 import numpy as np
@@ -29,10 +28,16 @@ def get_unit_vector(v):
 
 
 def get_vertices(n: int, r: float = RADIUS, center=CENTER, start=0) -> np.ndarray:
-    return r * np.array([
-        [np.cos(i - start), np.sin(i - start)]
-        for i in np.linspace(2 * np.pi, 0, n, endpoint=False)
-    ]) + center
+    return (
+        r
+        * np.array(
+            [
+                [np.cos(i - start), np.sin(i - start)]
+                for i in np.linspace(2 * np.pi, 0, n, endpoint=False)
+            ]
+        )
+        + center
+    )
 
 
 def scale_sizes(sizes, node_size):
@@ -52,14 +57,14 @@ def sungear(gene_lists, iterations: int = 50) -> Tuple[Dict, bool]:
 
     gene_lists = OrderedDict(((k, set(v)) for k, v in gene_lists.items()))
 
-    total_genes = reduce(or_, gene_lists.values())
+    total_genes = set(chain.from_iterable(gene_lists.values()))
     num_total = len(total_genes)
     gene_to_list: DefaultDict[str, List] = defaultdict(list)
 
     list_sizes = pd.Series({name: len(items) for name, items in gene_lists.items()})
 
     for name, genes in gene_lists.items():
-        for g in (total_genes & genes):
+        for g in total_genes & genes:
             gene_to_list[g].append(name)
 
     vertices = pd.DataFrame(get_vertices(num_lists, start=np.pi / 2))
@@ -69,24 +74,32 @@ def sungear(gene_lists, iterations: int = 50) -> Tuple[Dict, bool]:
     p_vals = []
 
     for name, group in groupby(
-            sorted(((sorted(v), k) for k, v in gene_to_list.items()),
-                   key=lambda x: (len(x[0]), x[0], x[1])),
-            key=itemgetter(0)):
+        sorted(
+            ((sorted(v), k) for k, v in gene_to_list.items()),
+            key=lambda x: (len(x[0]), x[0], x[1]),
+        ),
+        key=itemgetter(0),
+    ):
         items = tuple(map(itemgetter(1), group))
         prob = (list_sizes.loc[name] / num_total).product() * (
-                (num_total - list_sizes[list_sizes.index.difference(name)]) / num_total).product()
-        p_value = binom_test(len(items), num_total, prob, alternative='two-sided')
+            (num_total - list_sizes[list_sizes.index.difference(name)]) / num_total
+        ).product()
+        p_value = binom_test(len(items), num_total, prob, alternative="two-sided")
         p_vals.append(p_value)
 
-        intersects.append([
-            name, vertices.loc[name, :].mean(axis=0), items,
-            {'p_value': p_value, 'expected': num_total * prob}
-        ])
+        intersects.append(
+            [
+                name,
+                vertices.loc[name, :].mean(axis=0),
+                items,
+                {"p_value": p_value, "expected": num_total * prob},
+            ]
+        )
 
-    corr_p_vals = multipletests(p_vals, method='bonferroni')[1]
+    corr_p_vals = multipletests(p_vals, method="bonferroni")[1]
 
     for intersect, corr_p in zip(intersects, corr_p_vals):
-        intersect[3]['adj_p'] = corr_p
+        intersect[3]["adj_p"] = corr_p
 
     intersects = sorted(intersects, key=lambda n: (len(n[2]), len(n[1])))
     # drawing below
@@ -135,7 +148,10 @@ def sungear(gene_lists, iterations: int = 50) -> Tuple[Dict, bool]:
 
         for j in range(iterations):
             pdist = pairwise_distances(coords)
-            move_il = pdist[il].flatten() < sizes_scaled[il[0]] + sizes_scaled[il[1]] + 0.05 * node_size
+            move_il = (
+                pdist[il].flatten()
+                < sizes_scaled[il[0]] + sizes_scaled[il[1]] + 0.05 * node_size
+            )
 
             move_locs = np.full(pdist.shape, False)
             move_locs[il[0][move_il], il[1][move_il]] = True
@@ -147,8 +163,9 @@ def sungear(gene_lists, iterations: int = 50) -> Tuple[Dict, bool]:
 
             rand_move = np.isclose(norm(v, axis=1), 0, atol=node_size * 0.1)
             if rand_move.any():
-                v[rand_move] = get_unit_vector(
-                    np.random.normal(size=(np.sum(rand_move), 2))) * i
+                v[rand_move] = (
+                    get_unit_vector(np.random.normal(size=(np.sum(rand_move), 2))) * i
+                )
 
             move_vecs = v[to_move, :]
 
@@ -166,10 +183,13 @@ def sungear(gene_lists, iterations: int = 50) -> Tuple[Dict, bool]:
             far_coords = center_dist > 0
 
             center_move_dist = center_dist[far_coords, None] + node_size * 0.1
-            center_move_dist += np.random.random(center_move_dist.shape) * node_size * 0.1
+            center_move_dist += (
+                np.random.random(center_move_dist.shape) * node_size * 0.1
+            )
 
-            coords[far_coords] += get_unit_vector(
-                CENTER - coords[far_coords]) * center_move_dist  # add some randomness to center move
+            coords[far_coords] += (
+                get_unit_vector(CENTER - coords[far_coords]) * center_move_dist
+            )  # add some randomness to center move
 
             logger.info(f"iteration: {j + 1}, {move_vecs.shape[0]} adjustments")
 
@@ -180,9 +200,13 @@ def sungear(gene_lists, iterations: int = 50) -> Tuple[Dict, bool]:
     for n, c, s in zip(intersects, coords, sizes_scaled):
         n[1] = c
         n.append(s)
-        n.append(c + get_unit_vector((vertices.loc[n[0], :] - c).to_numpy()) * (s + 0.2 * node_size))
+        n.append(
+            c
+            + get_unit_vector((vertices.loc[n[0], :] - c).to_numpy())
+            * (s + 0.2 * node_size)
+        )
 
     return {
-               'vertices': [(idx, row) for idx, *row in vertices.itertuples(name=None)],
-               'intersects': intersects
-           }, finished
+        "vertices": [(idx, row) for idx, *row in vertices.itertuples(name=None)],
+        "intersects": intersects,
+    }, finished
