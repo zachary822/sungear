@@ -7,7 +7,7 @@ greenlet==1.1.0
 gunicorn==20.1.0
 itsdangerous==2.0.1
 Jinja2==3.0.1
-joblib==1.0.1
+joblib==1.2.0
 MarkupSafe==2.0.1
 monotonic==1.6
 mypy==0.910
